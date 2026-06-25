@@ -1,10 +1,10 @@
-Projeto de Precificação de Seguros
+Projeto de Precificação de Seguros.
 Este projeto foca na análise exploratória de dados e no desenvolvimento de modelos de Machine Learning para prever os custos de seguro de saúde (charges) com base em diversas características dos indivíduos.
 
-Sumário do Projeto
+Sumário do Projeto:
 O objetivo principal deste projeto é construir um modelo preditivo robusto para estimar os custos individuais de seguro de saúde, utilizando um dataset que contém informações demográficas, de saúde e hábitos dos segurados. Exploramos diferentes algoritmos de regressão e avaliamos seu desempenho para identificar o modelo mais adequado.
 
-Análise Exploratória de Dados (EDA) e Pré-processamento
+Análise Exploratória de Dados (EDA) e Pré-processamento:
 A etapa inicial envolveu uma análise detalhada do dataset Precificacao_Seguros.csv, cobrindo:
 
 Verificação de Valores Ausentes: Confirmamos a ausência de valores nulos, garantindo a completude dos dados.
