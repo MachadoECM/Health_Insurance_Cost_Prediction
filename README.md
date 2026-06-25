@@ -76,6 +76,11 @@ Essas hipóteses foram investigadas ao longo da análise exploratória.
 
 A etapa de Análise Exploratória teve como objetivo compreender o comportamento das variáveis e identificar padrões relevantes para o negócio.
 
+## Distribuição dos Custos Médicos
+
+![Distribuição Charges](images/distribuicao_charges.png)
+
+
 ## Etapas realizadas
 
 ### 1. Verificação da Qualidade dos Dados
@@ -153,6 +158,9 @@ Avaliando a relação entre:
 
 Foi construída uma matriz de correlação para identificar relações lineares entre todas as variáveis numéricas.
 
+## Matriz de Correlação
+
+![Heatmap](images/heatmap.png)
 ---
 
 # 🧪 Teste de Hipótese
@@ -356,4 +364,4 @@ Este projeto permitiu aplicar conceitos fundamentais e avançados de Ciência de
 
 Cientista de Dados com experiência em Analytics, Machine Learning, People Analytics, Business Intelligence e desenvolvimento de soluções orientadas a dados.
 
-📧 Entre em contato pelo LinkedIn para sugestões, melhorias ou oportunidades de colaboração.
+
