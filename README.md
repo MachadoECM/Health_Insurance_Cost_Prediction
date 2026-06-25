@@ -122,6 +122,9 @@ Objetivos:
 * Avaliar dispersão dos dados.
 * Compreender a distribuição das variáveis.
 
+## Box Plot 
+
+![Heatmap](images/Box_plot_1.png)
 ---
 
 ## 🔥 Impacto do Tabagismo
@@ -248,6 +251,10 @@ Modelo baseado em múltiplas árvores de decisão, reduzindo overfitting e aumen
 | MSE     | 20.255.300 |
 | MAE     | 2.473,87   |
 | RMSE    | 4.500,59   |
+
+## Gráfico de Dispersão  
+
+![Heatmap](images/Random_Forest_pred_real.png)
 
 ---
 
