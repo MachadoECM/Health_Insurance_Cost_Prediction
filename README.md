@@ -1,82 +1,359 @@
-Projeto de Precificação de Seguros.
-Este projeto foca na análise exploratória de dados e no desenvolvimento de modelos de Machine Learning para prever os custos de seguro de saúde (charges) com base em diversas características dos indivíduos.
+# 🏥 Precificação de Seguros de Saúde com Machine Learning
 
-Sumário do Projeto:
-O objetivo principal deste projeto é construir um modelo preditivo robusto para estimar os custos individuais de seguro de saúde, utilizando um dataset que contém informações demográficas, de saúde e hábitos dos segurados. Exploramos diferentes algoritmos de regressão e avaliamos seu desempenho para identificar o modelo mais adequado.
+## 📌 Visão Geral
 
-Análise Exploratória de Dados (EDA) e Pré-processamento:
-A etapa inicial envolveu uma análise detalhada do dataset Precificacao_Seguros.csv, cobrindo:
+Este projeto tem como objetivo desenvolver modelos de Machine Learning capazes de prever os custos médicos individuais cobrados por planos de saúde, utilizando características demográficas e comportamentais dos segurados.
 
-Verificação de Valores Ausentes: Confirmamos a ausência de valores nulos, garantindo a completude dos dados.
-Tipos de Dados: Observamos os tipos de dados para cada variável, identificando categóricas e numéricas.
-Estatísticas Descritivas: Geramos estatísticas para entender a distribuição e a centralidade das variáveis numéricas.
-Visualização: Boxplots e scatter plots foram utilizados para identificar outliers (notavelmente em bmi e charges) e relações entre variáveis. A variável smoker (fumante) mostrou ser o fator mais determinante para charges.
-Codificação de Variáveis Categóricas:
-smoker: Codificada para smoker_encoded (0 para não fumante, 1 para fumante).
-sex: Codificada para sex_encoded (0 para feminino, 1 para masculino).
-region: Convertida usando One-Hot Encoding em region_northwest, region_southeast, region_southwest.
-Análise de Correlação: Uma forte correlação positiva (0.7873) foi encontrada entre smoker_encoded e charges.
-Teste de Hipótese: Um teste t de Welch confirmou uma diferença estatisticamente significativa nas médias de charges entre fumantes e não fumantes (p-value extremamente baixo).
-Modelagem Preditiva
-Foram testados três modelos de regressão:
+A precificação adequada é um dos principais desafios das seguradoras, pois impacta diretamente a rentabilidade do negócio, a competitividade dos produtos oferecidos e a sustentabilidade financeira da carteira de clientes.
 
-Regressão Linear:
+Por meio de análises estatísticas, exploração dos dados e algoritmos de Machine Learning, buscamos identificar os principais fatores que influenciam o valor dos custos médicos e construir um modelo preditivo capaz de estimar esses valores com precisão.
 
-Modelo Inicial: age, bmi, smoker_encoded. R² de 0.7777.
-Modelo Expandido: age, bmi, children, smoker_encoded, sex_encoded. R² de 0.7811 (impacto mínimo de sex e children).
-Modelo Final: age, bmi, children, smoker_encoded, region (one-hot encoded). R² de 0.7836. Este foi o melhor modelo de regressão linear.
-Decision Tree Regressor: Treinado com as mesmas features do modelo final de Regressão Linear.
+---
 
-MSE: 39876049.53
-R²: 0.7431
-Conclusão: Desempenho inferior ao da Regressão Linear.
-Random Forest Regressor: Treinado com as mesmas features do modelo final de Regressão Linear.
+# 🎯 Problema de Negócio
 
-MSE: 20255300.47
-R²: 0.8695
-MAE: 2473.87
-RMSE: 4500.59
-Conclusão: Desempenho significativamente superior a ambos os modelos anteriores, tornando-o o algoritmo escolhido como o modelo final.
-Importância das Features no Random Forest
-O modelo Random Forest confirmou que as variáveis mais importantes para prever os custos de seguro são:
+Seguradoras precisam definir preços compatíveis com o risco apresentado por cada segurado.
 
-smoker_encoded: De longe a feature mais influente (importância de ~0.61).
-bmi: Segunda feature mais importante (importância de ~0.22).
-age: Terceira feature mais importante (importância de ~0.13).
-children e as variáveis de region mostraram impacto muito menor.
-Visualização do Desempenho
-Um gráfico de dispersão dos valores reais vs. previstos pelo Random Forest mostrou que a maioria dos pontos se alinha bem com a linha de previsão perfeita, indicando um alto grau de acurácia do modelo.
+Uma precificação inadequada pode gerar:
 
-Modelo Salvo
-O modelo RandomForestRegressor treinado foi salvo como random_forest_regressor_model.joblib para uso futuro. Isso permite carregar o modelo e fazer novas previsões sem a necessidade de retreinamento.
+* Subprecificação: prejuízos financeiros devido à cobrança insuficiente.
+* Superprecificação: perda de clientes para concorrentes.
+* Dificuldade na gestão de riscos.
+* Problemas de sustentabilidade da carteira de seguros.
 
-Como Utilizar o Modelo Salvo
-Para carregar o modelo e fazer previsões em novos dados:
+O objetivo deste projeto é responder à seguinte pergunta:
 
-import joblib
-import pandas as pd
+> É possível prever os custos médicos individuais de um segurado utilizando características pessoais e comportamentais?
 
-# Carregar o modelo salvo
-model_filename = 'random_forest_regressor_model.joblib'
-loaded_rf_model = joblib.load(model_filename)
+---
 
-print(f"Modelo '{model_filename}' carregado com sucesso!")
+# 📊 Base de Dados
 
-# Preparar novos dados para previsão
-# **IMPORTANTE:** As colunas e a codificação devem ser exatamente as mesmas do treinamento.
-# Features: 'age', 'bmi', 'children', 'smoker_encoded', 'region_northwest', 'region_southeast', 'region_southwest'
+A base utilizada contém informações demográficas, geográficas e comportamentais dos segurados.
 
-new_individual_data = pd.DataFrame({
-    'age': [35], # Exemplo: 35 anos
-    'bmi': [28.5], # Exemplo: BMI de 28.5
-    'children': [2], # Exemplo: 2 filhos
-    'smoker_encoded': [1], # Exemplo: É fumante (1)
-    'region_northwest': [0],
-    'region_southeast': [0],
-    'region_southwest': [1] # Exemplo: Região sudoeste (1)
-})
+## Dicionário de Dados
 
-# Realizar a previsão
-predicted_charge = loaded_rf_model.predict(new_individual_data)
+| Variável | Descrição                                                   |
+| -------- | ----------------------------------------------------------- |
+| age      | Idade do beneficiário principal                             |
+| sex      | Sexo do segurado                                            |
+| bmi      | Índice de Massa Corporal (IMC)                              |
+| children | Quantidade de dependentes cobertos pelo seguro              |
+| smoker   | Indica se o beneficiário é fumante                          |
+| region   | Região de residência nos Estados Unidos                     |
+| charges  | Custos médicos cobrados pelo plano de saúde (variável alvo) |
 
-print(f"Custo de seguro previsto para o novo indivíduo: ${predicted_charge[0]:.2f}")
+---
+
+# 🔎 Entendimento do Negócio
+
+Do ponto de vista atuarial e financeiro, algumas hipóteses podem explicar o aumento dos custos médicos:
+
+* Pessoas mais velhas tendem a utilizar mais serviços médicos.
+* Fumantes costumam apresentar maior risco de doenças crônicas.
+* IMC elevado pode estar associado a problemas de saúde.
+* Famílias maiores podem gerar maior utilização do plano.
+* Diferenças regionais podem refletir custos distintos de atendimento.
+
+Essas hipóteses foram investigadas ao longo da análise exploratória.
+
+---
+
+# 🛠️ Tecnologias Utilizadas
+
+* Python
+* Pandas
+* NumPy
+* Matplotlib
+* Seaborn
+* Scikit-Learn
+* Joblib
+* Jupyter Notebook
+
+---
+
+# 📈 Análise Exploratória dos Dados (EDA)
+
+A etapa de Análise Exploratória teve como objetivo compreender o comportamento das variáveis e identificar padrões relevantes para o negócio.
+
+## Etapas realizadas
+
+### 1. Verificação da Qualidade dos Dados
+
+* Identificação de valores ausentes.
+* Validação dos tipos de dados.
+* Verificação da consistência das variáveis.
+
+### 2. Estatísticas Descritivas
+
+Foram calculadas medidas como:
+
+* Média
+* Mediana
+* Desvio padrão
+* Valores mínimos e máximos
+* Quartis
+
+para todas as variáveis numéricas.
+
+### 3. Análise das Variáveis Categóricas
+
+Avaliação da distribuição das categorias:
+
+* Sexo
+* Fumante
+* Região
+
+---
+
+## 📦 Distribuição das Variáveis
+
+Foram construídos boxplots para:
+
+* Age
+* BMI
+* Children
+* Charges
+
+Objetivos:
+
+* Detectar possíveis outliers.
+* Avaliar dispersão dos dados.
+* Compreender a distribuição das variáveis.
+
+---
+
+## 🔥 Impacto do Tabagismo
+
+Uma das análises mais relevantes foi a comparação dos custos médicos entre fumantes e não fumantes.
+
+Os resultados evidenciaram que:
+
+* Fumantes apresentam custos significativamente superiores.
+* A variável "smoker" demonstrou forte capacidade explicativa sobre os custos médicos.
+
+Essa conclusão foi posteriormente confirmada pelos modelos preditivos.
+
+---
+
+## 🔗 Análise de Correlação
+
+Foram realizadas:
+
+### Correlação de Pearson
+
+Avaliando a relação entre:
+
+* Age × Charges
+* BMI × Charges
+* Smoker × Charges
+* Children × Charges
+
+### Heatmap de Correlação
+
+Foi construída uma matriz de correlação para identificar relações lineares entre todas as variáveis numéricas.
+
+---
+
+# 🧪 Teste de Hipótese
+
+Foi realizado um teste estatístico para verificar se existe diferença significativa entre os custos médicos de:
+
+* Fumantes
+* Não fumantes
+
+Resultado:
+
+* A hipótese nula foi rejeitada.
+* Existe evidência estatística de que fumantes possuem custos médicos significativamente maiores.
+
+Esse resultado reforça a importância do comportamento do segurado na precificação dos seguros.
+
+---
+
+# 🤖 Engenharia de Features
+
+Para preparar os dados para os algoritmos de Machine Learning foram realizadas transformações como:
+
+### Variáveis Binárias
+
+* smoker → smoker_encoded
+* sex → sex_encoded
+
+### One-Hot Encoding
+
+Aplicado na variável:
+
+* region
+
+Gerando novas variáveis indicadoras para cada região.
+
+---
+
+# 🚀 Modelos de Machine Learning Testados
+
+Foram avaliados diferentes algoritmos de regressão para estimar os custos médicos.
+
+## 1. Regressão Linear
+
+Modelo base utilizado para entender o comportamento das variáveis.
+
+### Variáveis utilizadas inicialmente
+
+* age
+* bmi
+* smoker
+
+Posteriormente foram adicionadas:
+
+* children
+* sex
+* region
+
+### Resultado Final
+
+| Métrica | Valor      |
+| ------- | ---------- |
+| R²      | 0.7836     |
+| MSE     | 33.602.504 |
+
+---
+
+## 2. Decision Tree Regressor
+
+Modelo não linear capaz de capturar relações mais complexas entre as variáveis.
+
+### Resultado
+
+| Métrica | Valor      |
+| ------- | ---------- |
+| R²      | 0.7431     |
+| MSE     | 39.876.049 |
+
+---
+
+## 3. Random Forest Regressor
+
+Modelo baseado em múltiplas árvores de decisão, reduzindo overfitting e aumentando a capacidade preditiva.
+
+### Resultado
+
+| Métrica | Valor      |
+| ------- | ---------- |
+| R²      | 0.8695     |
+| MSE     | 20.255.300 |
+| MAE     | 2.473,87   |
+| RMSE    | 4.500,59   |
+
+---
+
+# 🏆 Comparação dos Modelos
+
+| Modelo           | R²         | MSE            |
+| ---------------- | ---------- | -------------- |
+| Regressão Linear | 0.7836     | 33.602.504     |
+| Decision Tree    | 0.7431     | 39.876.049     |
+| Random Forest    | **0.8695** | **20.255.300** |
+
+O Random Forest apresentou o melhor desempenho entre os modelos avaliados.
+
+---
+
+# 📌 Importância das Variáveis
+
+A análise de importância das features mostrou que algumas variáveis possuem maior influência na previsão dos custos médicos.
+
+Os principais fatores explicativos observados foram:
+
+1. Tabagismo (smoker)
+2. Idade (age)
+3. Índice de Massa Corporal (BMI)
+4. Número de dependentes
+5. Região de residência
+
+Do ponto de vista do negócio, esse resultado é coerente com fatores tradicionalmente utilizados em análises de risco e precificação.
+
+---
+
+# 💾 Persistência do Modelo
+
+O modelo final foi salvo utilizando a biblioteca Joblib, permitindo:
+
+* Reutilização em produção.
+* Integração com APIs.
+* Implementação em aplicações web.
+* Criação de simuladores de cotação.
+
+---
+
+# 📊 Conclusões
+
+Os resultados demonstram que é possível prever custos médicos com boa precisão utilizando características demográficas e comportamentais dos segurados.
+
+Principais aprendizados:
+
+* O tabagismo é o principal fator associado ao aumento dos custos médicos.
+* Idade e IMC possuem forte influência sobre os gastos.
+* Modelos não lineares capturam melhor os padrões dos dados.
+* O Random Forest apresentou desempenho superior aos demais algoritmos avaliados.
+
+Com um R² de aproximadamente 87%, o modelo foi capaz de explicar grande parte da variabilidade dos custos médicos observados.
+
+---
+
+# 🚀 Próximos Passos
+
+Para evoluir este projeto para um cenário mais próximo da realidade de mercado, algumas melhorias podem ser implementadas:
+
+### Modelagem
+
+* XGBoost
+* LightGBM
+* CatBoost
+* Gradient Boosting
+
+### Engenharia de Features
+
+* Faixas etárias
+* Categorias de IMC
+* Interações entre variáveis
+* Variáveis de risco compostas
+
+### Avaliação
+
+* Cross Validation
+* Grid Search
+* Random Search
+* Feature Selection
+
+### Deploy
+
+* API com FastAPI
+* Dashboard com Streamlit
+* Containerização com Docker
+* Deploy em Cloud (AWS, Azure ou GCP)
+
+---
+
+# 📚 Aprendizados
+
+Este projeto permitiu aplicar conceitos fundamentais e avançados de Ciência de Dados:
+
+* Estatística Descritiva
+* Testes de Hipótese
+* Análise Exploratória de Dados
+* Engenharia de Features
+* Machine Learning Supervisionado
+* Avaliação de Modelos
+* Interpretabilidade
+* Persistência de Modelos
+
+---
+
+# 👨‍💻 Autor
+
+**Everson Cardozo**
+
+Cientista de Dados com experiência em Analytics, Machine Learning, People Analytics, Business Intelligence e desenvolvimento de soluções orientadas a dados.
+
+📧 Entre em contato pelo LinkedIn para sugestões, melhorias ou oportunidades de colaboração.
